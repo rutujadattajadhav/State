@@ -1,0 +1,36 @@
+spring:
+  jpa:
+    show-sql:  true
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  datasource:
+    driver-class-name:  com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/practice
+    username:  root
+    password:  root
+  application:
+    name: STATE
+  config:
+    import: configserver:http://localhost:8086
+  webflux:
+    base-path: /state
+server:
+  port: 8088
+
+management:
+  zipkin:
+    tracing:
+      endpoint: http://localhost:8080/api/v2/spans
+  tracing:
+    sampling:
+      probability: 1.0
+logging:
+  level:
+    root: info
+    web: debug
+    reactor:
+      netty:
+        http:
+          client: DEBUG
