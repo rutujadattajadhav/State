@@ -2,6 +2,8 @@ package com.rutuja.state.service;
 
 import com.rutuja.state.model.StateModel;
 import com.rutuja.state.repo.StateRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,11 +12,14 @@ import java.util.List;
 
 @Service
 public class StateService {
+
+    Logger log= LoggerFactory.getLogger(this.getClass());
     @Autowired
     private StateRepository stateRepository;
 
     public StateModel getStateById(Integer stateId) throws Exception {
        if(stateRepository.findById(stateId).isPresent()){
+           log.debug("Id is present in the table");
         return   stateRepository.findById(stateId).get();
        }
        throw new Exception("State not found");
