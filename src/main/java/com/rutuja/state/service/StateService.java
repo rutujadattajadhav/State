@@ -28,7 +28,7 @@ public class StateService {
     public List<StateModel> getAllState() throws Exception {
         List<StateModel> listOfState=new ArrayList<>();
         Iterable<StateModel> states=stateRepository.findAll();
-        if(stateRepository!=null){
+        if(states!=null){
             states.forEach((state)->{
                 listOfState.add(state);
             });
