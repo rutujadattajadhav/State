@@ -1,17 +1,24 @@
 package com.rutuja.state.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import lombok.Data;
 
-@Entity(name = "state")
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+@Table(name = "state")
 @Data
 public class StateModel {
-    @Column(name = "stateId")
+    @Column(value = "stateId")
     @Id
-   private Integer stateId;
+   private Integer stateId;//stateName
 
-    @Column(name = "stateName")
-    private String stateName;
+    @Column(value = "stateName")
+    private String stateName;//stateName
+
+    @Column(value = "countryid")
+    private Integer countryId;
+
+    @Column(value = "action")
+    private String action;
 }
