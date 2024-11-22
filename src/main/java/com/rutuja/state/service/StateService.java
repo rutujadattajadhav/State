@@ -93,12 +93,9 @@ public class StateService {
                                 return Mono.empty();
                             })
                             .map(country -> {
-
-
                                 stateResponce.getCountry().setCountryName(country.getCountryName());
                                 return stateResponce;
                             });
-
                 })
                 .switchIfEmpty(Flux.error(new Exception("States not found")))
                 .onErrorResume(error -> {
