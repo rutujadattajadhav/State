@@ -1,5 +1,7 @@
 package com.rutuja.state.service;
 
+import com.rutuja.state.error.SError;
+import com.rutuja.state.exception.ServiceException;
 import com.rutuja.state.model.Country;
 import com.rutuja.state.model.StateModel;
 import com.rutuja.state.model.StateRequestBean;
@@ -18,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -47,9 +50,11 @@ public class StateService {
  //calling the findBystateId method of stateRepository to get the state by stateId
  //if findBystateId method returns empty then return error message,
  //otherwise return the stateModel
-    public Mono<StateModel> getStateById(Integer stateId) throws Exception {
+    public Mono<StateModel> getStateById(Integer stateId) throws ServiceException {
+       List<SError> errorList=new ArrayList<>();
         Mono<StateModel> modelMono=stateRepository.findBystateId(stateId);
-       return modelMono.switchIfEmpty(Mono.error(new Exception("State not found")));
+        errorList.add(new SError("state not found","123"));
+       return modelMono.switchIfEmpty(Mono.error(new ServiceException(errorList)));
 
     }
 
@@ -233,5 +238,33 @@ public Mono<String> saveState(StateRequestBean stateRequestBean) {
                     return Flux.error(new RuntimeException("Unable to fetch state details"));
                 });
     }
+
+    public Mono<String> updateStateByPatch(Integer id, StateModel stateModel) {
+        return stateRepository.findById(id)
+                .flatMap(state -> {
+                    boolean updated = false;
+
+                    if (stateModel.getStateName() != null) {
+                        state.setStateName(stateModel.getStateName());
+                        updated = true;
+                    }
+
+                    if (stateModel.getCountryId() != null) {
+                        state.setCountryId(stateModel.getCountryId());
+                        updated = true;
+                    }
+
+                    if (updated) {
+                        return stateRepository.save(state).thenReturn("Update Successfully");
+                    } else {
+                        return Mono.just("No fields to update");
+                    }
+                })
+                .switchIfEmpty(Mono.just("State not found"))
+                .onErrorResume(e->{
+                    return Mono.error(new Exception("error occour at the time find state"));
+                });
+    }
+
 
 }

@@ -1,8 +1,11 @@
 package com.rutuja.state.controller;
 
+import com.rutuja.state.error.SError;
+import com.rutuja.state.exception.ServiceException;
 import com.rutuja.state.model.StateModel;
 import com.rutuja.state.model.StateRequestBean;
 import com.rutuja.state.model.StateResponce;
+import com.rutuja.state.responce.StateResponce2;
 import com.rutuja.state.service.StateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +32,20 @@ public class StateController {
     //return=StateModel
     //calling=stateService.getStateById(stateId) : return this method Mono<StateModel>
  @GetMapping(value = "stateById/{stateId}")
-public Mono<StateModel> getStateById(@PathVariable("stateId") Integer stateId) throws Exception {
-     log.debug("stateId input :"+stateId);
-    return stateService.getStateById(stateId);
+public Mono<StateResponce2> getStateById(@PathVariable("stateId") Integer stateId) throws ServiceException {
+     return stateService.getStateById(stateId)
+             .map(state -> {
+                 StateResponce2 stateResponse = new StateResponce2();
+                 stateResponse.setData(state);
+                 return stateResponse; })
+     .onErrorResume(e -> { if (e instanceof ServiceException) {
+         StateResponce2 stateResponse = new StateResponce2();
+        List  eer=((ServiceException) e).getErrorMessage();
+         stateResponse.setError(eer);
+          return Mono.just(stateResponse);
+     }
+         return Mono.error(e);
+     });
 }
 
 //method=getAllState
@@ -104,5 +118,10 @@ public Mono<StateModel> getStateById(@PathVariable("stateId") Integer stateId) t
     @GetMapping(value="countryId/{countryId}")
     public Flux<StateModel> getStateByCountryId(@PathVariable("countryId") Integer countryId) {
         return stateService.getStateByCountryId(countryId);
+    }
+
+    @PatchMapping("updatebyPatch/{id}")
+    public Mono<String> updateUserbyPatch(@PathVariable Integer id,@RequestBody StateModel stateModel){
+      return stateService.updateStateByPatch(id,stateModel);
     }
 }
