@@ -1,6 +1,7 @@
   package com.rutuja.state.service;
 
 
+import com.rutuja.state.exception.ServiceException;
 import com.rutuja.state.model.Country;
 import com.rutuja.state.model.StateModel;
 import com.rutuja.state.model.StateRequestBean;
@@ -192,7 +193,7 @@ public class StateServiceTest {
     }
 
     @Test
-    public void saveStateSuccess() {
+    public void saveStateSuccess() throws ServiceException {
         StateModel stateModel = new StateModel();
         stateModel.setStateName("TestState");
         stateModel.setCountryId(1);
@@ -218,7 +219,7 @@ public class StateServiceTest {
 
 
     @Test
-    public void testSaveState_InsertError() {
+    public void testSaveState_InsertError() throws ServiceException {
         StateModel stateModel = new StateModel();
         stateModel.setStateName("TestState");
         stateModel.setCountryId(1);
@@ -240,7 +241,7 @@ public class StateServiceTest {
     }
 
     @Test
-    public void findTest_error() {
+    public void findTest_error() throws ServiceException {
         StateRequestBean stateRequestBean = new StateRequestBean();
         stateRequestBean.setStateName("TestState");
         Country country = new Country();
@@ -256,7 +257,7 @@ public class StateServiceTest {
     }
 
     @Test
-    public void saveState_ErrorUpdateSuccess() {
+    public void saveState_ErrorUpdateSuccess() throws ServiceException {
         StateModel stateModel = new StateModel();
         stateModel.setStateName("TestState");
         stateModel.setCountryId(1);

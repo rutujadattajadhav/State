@@ -25,4 +25,5 @@ public class UserService implements ReactiveUserDetailsService {
     public Mono<UserDetails> findByUsername(String username) {
         return userRepository.findById(username).map(UserEntity ::new);
     }
+
 }

@@ -14,18 +14,12 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 public class SecurityConfig {
 
     @Autowired
-    //private JwtAuthenticationFilter jwtAuthenticationFilter;
 
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http.cors(corsSpec -> corsSpec.disable())
                 .csrf(csrfSpec -> csrfSpec.disable());
-                //.httpBasic(Customizer.withDefaults())
-                //.authorizeExchange(exchanges -> exchanges
-                        //.pathMatchers( "/saveUser").permitAll()
-                        //.anyExchange().authenticated());
-                //.addFilterBefore(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION);
         return http.build();
     }
 

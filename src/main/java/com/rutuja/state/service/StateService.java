@@ -138,10 +138,11 @@ public class StateService {
 //otherwise call flatMap() and return "Success"
 //if any error occurs then call onErrorResume() and return "error"
     public Mono<String> updateState( StateRequestBean stateRequestBean){
+List<SError> errorList=new ArrayList<>();
         StateModel stateModel = new StateModel();
         stateModel.setStateName(stateRequestBean.getStateName());
         stateModel.setStateId(stateRequestBean.getStateId());
-       return stateRepository.findById(stateModel.getStateId())
+        return stateRepository.findById(stateModel.getStateId())
                 .flatMap(exitState->{
             return stateRepository.updateState(stateModel.getStateName(),stateModel.getStateId())
                     .switchIfEmpty(Mono.error(new Exception("not updated")))
@@ -150,7 +151,8 @@ public class StateService {
                 .switchIfEmpty( Mono.just("not found"))
               .onErrorResume(error -> {
             log.error("Error during user updation: ",error);
-            return Mono.just("error");
+            errorList.add(new SError("Error during user updation","123"));
+            return Mono.error(new ServiceException(errorList));
         });
     }
 
@@ -171,7 +173,8 @@ public class StateService {
 //otherwise call flatMap() and return "Successfully save state"
 //if any error occurs then call onErrorResume() and return "error"
 @Transactional
-public Mono<String> saveState(StateRequestBean stateRequestBean) {
+public Mono<String> saveState(StateRequestBean stateRequestBean)  {
+    List<SError> errorList=new ArrayList<>();
     StateModel stateModel = new StateModel();
     stateModel.setStateName(stateRequestBean.getStateName());
     stateModel.setCountryId(stateRequestBean.getCountry().getCountryId());
@@ -190,15 +193,17 @@ public Mono<String> saveState(StateRequestBean stateRequestBean) {
                                                 .switchIfEmpty(Mono.error(new Exception("not updated")))
                                                 .flatMap(integer -> Mono.just("Successfully save state"))
                                                 .onErrorResume(error -> {
+                                                    errorList.add(new SError("Error during user updation","104"));
                                                     log.error("Error during user updation: ", error);
-                                                    return Mono.just("Please try after some time or contact system admin");
+                                                    return Mono.error(new ServiceException(errorList));
                                                 });
                                     });
                         }));
             })
             .onErrorResume(error -> {
+                errorList.add(new SError("Error during insert updation","111"));
                 log.error("Error during insert updation: ", error);
-                return Mono.just("Error during insert updation: " + error.getMessage());
+                return Mono.error(new ServiceException(errorList));
             });
 }
 
@@ -211,12 +216,15 @@ public Mono<String> saveState(StateRequestBean stateRequestBean) {
     //otherwise call flatMap() and return "Success"
     //if any error occurs then call onErrorResume() and return "error"
     public Mono<String> delete(Integer stateId){
+        List<SError> errorList=new ArrayList<>();
        Mono<Integer> updatedByAction= stateRepository.updateByAction(stateId);
+        errorList.add(new SError("Error during state deletion","103"));
         return  updatedByAction .flatMap(stateInt -> Mono.just("Success"))
-                .switchIfEmpty(Mono.error(new Exception("not deleted")))
+                .switchIfEmpty(Mono.error(new ServiceException(errorList)))
                 .onErrorResume(error->{
+                    errorList.add(new SError("Error during state updation","103"));
                     log.error("Error during state updation: ",error);
-                    return Mono.just("error");
+                    return Mono.error(new ServiceException(errorList));
                 });
     }
 
